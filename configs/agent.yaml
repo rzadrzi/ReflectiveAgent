@@ -1,0 +1,30 @@
+agent:
+  name: "ReflectiveReasoningAgent"
+  mode: "adaptive"
+
+execution:
+  max_attempts: 3
+  stop_on_success: true
+
+reflection:
+  enabled: true
+  trigger_on_failure: true
+  max_reflections: 2
+
+memory:
+  enabled: true
+  type: "episodic"
+  retrieval_top_k: 3
+
+debate:
+  enabled: true
+  num_sub_agents: 3
+  arbitration_strategy: "consensus"
+
+evaluation:
+  success_threshold: 1.0
+  track_metrics: true
+
+logging:
+  level: "info"
+  save_traces: true
