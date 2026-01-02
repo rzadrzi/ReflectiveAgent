@@ -38,11 +38,11 @@ def _get(filename, path: str, default=None) -> Any:
     _yaml_cfg = _load_yaml_config(filename)
 
 
-    parts = path.split(".")
-    cur = _yaml_cfg
-    for p in parts:
-        if not isinstance(cur, dict) or p not in cur:
-            return default
-        cur = cur[p]
-    return cur
+    # parts = path.split(".")
+    # cur = _yaml_cfg
+    # for p in parts:
+    #     if not isinstance(cur, dict) or p not in cur:
+    #         return default
+    #     cur = cur[p]
+    # return cur
 
