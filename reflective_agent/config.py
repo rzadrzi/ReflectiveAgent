@@ -1,4 +1,4 @@
-# src/config.py
+# reflective_agent/config.py
 
 from dataclasses import dataclass
 from pathlib import Path
