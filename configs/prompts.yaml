@@ -1,0 +1,6 @@
+solver_prompt: | Solve the puzzle carefully.
+
+reflection_prompt: | Analyze why the previous answer failed.
+
+debate_prompt: | Critique the other agent.
+

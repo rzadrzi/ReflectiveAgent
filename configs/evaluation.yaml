@@ -1,0 +1,2 @@
+success_threshold: 0.8
+reward_decay: 0.95
