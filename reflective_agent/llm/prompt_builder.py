@@ -63,7 +63,7 @@ class PromptBuilder:
             Reflection:
             """.strip()
 
-    
+
     def build_debate_prompt(self,
                             puzzle: Any,
                             agent_answer: str,
