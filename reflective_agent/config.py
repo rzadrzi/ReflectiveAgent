@@ -7,8 +7,8 @@ from typing import Any
 import yaml
 
 BASE_DIR = Path(__file__).resolve().parents[2]
-CONFIG_FILE = BASE_DIR / "configs" / "core.yaml"
-PROMPTS_FILE = BASE_DIR / "configs" / "prompt.yaml"
+CONFIG_FILE = BASE_DIR / "config" / "core.yaml"
+PROMPTS_FILE = BASE_DIR / "config" / "prompt.yaml"
 DATA_DIR = BASE_DIR / "data"
 
 
