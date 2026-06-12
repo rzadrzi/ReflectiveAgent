@@ -1,5 +1,5 @@
 from dataclasses import dataclass
 
-@dataclasse
+@dataclass
 class Puzzle:
     name: str
