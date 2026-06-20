@@ -71,3 +71,37 @@ class VectorMemory:
             Outcome: {episode.outcome}
             """
         return text.strip()
+
+    def _generate_document_id(self, episode: Episode) -> str:
+        """
+        Create ID for every document for ChromaDB
+        """
+        return f"episode_{episode.episode_id}"
+
+    def add_episode(self, episode: Episode) -> None:
+        """
+        Add Episode in vectorDB
+        """
+        document_id = self._generate_document_id(episode)
+        text = self._prepare_episode_text(episode)
+        embedding = self._get_embedding(text)
+
+        # Create metadata
+        metadata = {
+            "puzzle_id": episode.puzzle_id,
+            "outcome": episode.outcome,
+            "timestamp": episode.timestamp,
+            "final_answer": episode.final_answer[:100],
+        }
+
+        # Add in ChromaDB
+        self.collection.add(
+            ids=[document_id],
+            embeddings=[embedding],
+            documents=[text],
+            metadatas=[metadata],
+        )
+
+        print(
+            f"[VectorMemory] Added episode {episode.episode_id[:8]}... (outcome: {episode.outcome})"
+        )
