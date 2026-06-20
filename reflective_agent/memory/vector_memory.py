@@ -46,15 +46,28 @@ class VectorMemory:
             f"[VectorMemory] Initialized with collection '{collection_name}' ({self.collection.count()} episodes)"
         )
 
-        def _get_embedding(self, text: str) -> List[float]:
+    def _get_embedding(self, text: str) -> List[float]:
+        """
+        Convert TEXT to vector use OpenAI Embeddings
+        """
+        try:
+            response = self.openai_client.embeddings.create(
+                model=self.embedding_model, input=text
+            )
+            return response.data[0].embedding
+        except Exception as e:
+            print(f"[VectorMemory] Error getting embedding: {e}")
+            raise
+
+    def _prepare_episode_text(self, episode: Episode) -> str:
+        """
+        Prepare Episodic Text for Embeddings
+        """
+        text = f"""
+            Puzzle: {episode.puzzle_text}
+
+            Reflection: {episode.reflection}
+
+            Outcome: {episode.outcome}
             """
-            Convert TEXT to vector use OpenAI Embeddings
-            """
-            try:
-                response = self.openai_client.embeddings.create(
-                    model=self.embedding_model, input=text
-                )
-                return response.data[0].embedding
-            except Exception as e:
-                print(f"[VectorMemory] Error getting embedding: {e}")
-                raise
+        return text.strip()
