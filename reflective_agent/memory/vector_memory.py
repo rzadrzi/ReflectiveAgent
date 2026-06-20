@@ -205,3 +205,13 @@ class VectorMemory:
             metadata={"description": "Episodic memory for self-improving LLM agent"},
         )
         print("[VectorMemory] Vector memory cleared.")
+
+    def get_stats(self) -> Dict[str, Any]:
+        """
+        Get status of vectorDB
+        """
+        return {
+            "total_episodes": self.collection.count(),
+            "collection_name": self.collection_name,
+            "persist_directory": str(self.persist_directory),
+        }
