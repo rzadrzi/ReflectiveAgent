@@ -152,3 +152,34 @@ class VectorMemory:
                 )
 
         return similar_episodes
+
+    def search_similar_failures(
+        self, query_text: str, n_results: int = 3
+    ) -> List[Dict[str, Any]]:
+        """
+        Search for failure
+        """
+        return self.search_similar(
+            query_text=query_text, n_results=n_results, filter_outcome="failure"
+        )
+
+    def get_episode_by_id(self, episode_id: str) -> Optional[Dict[str, Any]]:
+        """
+        get an episode by ID
+        """
+        document_id = f"episode_{episode_id}"
+        try:
+            result = self.collection.get(
+                ids=[document_id], include=["documents", "metadatas"]
+            )
+
+            if result["ids"]:
+                return {
+                    "document_id": result["ids"][0],
+                    "text": result["documents"][0],
+                    "metadata": result["metadatas"][0],
+                }
+        except Exception as e:
+            print(f"[VectorMemory] Error retrieving episode: {e}")
+
+        return None
