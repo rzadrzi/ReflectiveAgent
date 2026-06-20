@@ -44,7 +44,7 @@ class EpisodicMemory:
     def _save_to_disk(self):
         try:
             with open(self.storage_path, 'w', encoding='utf-8') as f:
-                # تبدیل لیست اشیاء Pydantic به لیست دیکشنری
+
                 json_data = [ep.to_dict() for ep in self.episodes]
                 json.dump(json_data, f, indent=4, ensure_ascii=False)
         except Exception as e:
