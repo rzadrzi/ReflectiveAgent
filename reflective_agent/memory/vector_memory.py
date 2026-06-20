@@ -105,3 +105,50 @@ class VectorMemory:
         print(
             f"[VectorMemory] Added episode {episode.episode_id[:8]}... (outcome: {episode.outcome})"
         )
+
+    def search_similar(
+        self, query_text: str, n_results: int = 5, filter_outcome: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Search similarity based on query text
+
+        Args:
+            query_text: puzzle text or new question
+            n_results: number of result
+            filter_outcome: ('success' or 'failure')
+
+        Returns:
+            Dict of {episode_id, metadata, similarity_score}
+        """
+        # query to embedding
+        query_embedding = self._get_embedding(query_text)
+
+        where_filter = None
+        if filter_outcome:
+            where_filter = {"outcome": filter_outcome}
+
+        # Search in vectorDB
+        results = self.collection.query(
+            query_embeddings=[query_embedding],
+            n_results=n_results,
+            where=where_filter,
+            include=["documents", "metadatas", "distances"],
+        )
+
+        similar_episodes = []
+        if results["ids"] and results["ids"][0]:
+            for i, doc_id in enumerate(results["ids"][0]):
+                distance = results["distances"][0][i]
+                similarity_score = 1 - (distance / 2)  # Convert to 0, 1
+
+                similar_episodes.append(
+                    {
+                        "document_id": doc_id,
+                        "text": results["documents"][0][i],
+                        "metadata": results["metadatas"][0][i],
+                        "similarity_score": similarity_score,
+                        "distance": distance,
+                    }
+                )
+
+        return similar_episodes
