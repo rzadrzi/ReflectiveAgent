@@ -183,3 +183,25 @@ class VectorMemory:
             print(f"[VectorMemory] Error retrieving episode: {e}")
 
         return None
+
+    def delete_episode(self, episode_id: str) -> None:
+        """
+        Delete an epsode by ID
+        """
+        document_id = f"episode_{episode_id}"
+        try:
+            self.collection.delete(ids=[document_id])
+            print(f"[VectorMemory] Deleted episode {episode_id[:8]}...")
+        except Exception as e:
+            print(f"[VectorMemory] Error deleting episode: {e}")
+
+    def clear(self) -> None:
+        """
+        Clear memory
+        """
+        self.chroma_client.delete_collection(name=self.collection_name)
+        self.collection = self.chroma_client.create_collection(
+            name=self.collection_name,
+            metadata={"description": "Episodic memory for self-improving LLM agent"},
+        )
+        print("[VectorMemory] Vector memory cleared.")
