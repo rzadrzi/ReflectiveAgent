@@ -143,7 +143,7 @@ return {added: count, errors: count}
 ### Basic Operations
 
 ```python
-from src.memory.memory_store import MemoryStore
+from reflective_agent.memory.memory_store import MemoryStore
 
 # Initialize
 memory = MemoryStore(
