@@ -1,6 +1,204 @@
-solver_prompt: | Solve the puzzle carefully.
+# Prompt Templates
+prompts:
+  # Base system prompt
+  system:
+    base: |
+      You are an expert puzzle solver with strong logical reasoning capabilities.
+      Your task is to solve puzzles step by step, showing your reasoning process clearly.
 
-reflection_prompt: | Analyze why the previous answer failed.
+      Rules:
+      1. Think carefully before answering
+      2. Show your step-by-step reasoning
+      3. Verify your answer before finalizing
+      4. If unsure, state your uncertainty
 
-debate_prompt: | Critique the other agent.
+    adaptive_additions: [] # Will be populated by adaptation module
 
+  # Puzzle solving prompt
+  puzzle:
+    template: |
+      {system_prompt}
+
+      ## Puzzle Information
+      **Type**: {puzzle_type}
+      **Difficulty**: {difficulty}
+
+      ## Puzzle Statement
+      {puzzle_text}
+
+      ## Instructions
+      Please solve this puzzle step by step:
+      1. Analyze the given information
+      2. Identify constraints and rules
+      3. Apply logical reasoning
+      4. Verify your solution
+      5. Provide your final answer
+
+      Format your response as JSON:
+      {{
+        "reasoning_steps": ["step 1", "step 2", ...],
+        "final_answer": "your answer here",
+        "confidence": 0.0-1.0,
+        "verification": "how you verified your answer"
+      }}
+
+    variables:
+      - system_prompt
+      - puzzle_type
+      - difficulty
+      - puzzle_text
+
+  # Reflection prompt
+  reflection:
+    template: |
+      You attempted to solve a puzzle but made an error. Analyze your reasoning process.
+
+      ## Original Puzzle
+      {puzzle_text}
+
+      ## Your Reasoning
+      {reasoning_steps}
+
+      ## Your Answer
+      {your_answer}
+
+      ## Correct Answer
+      {correct_answer}
+
+      ## Task
+      Analyze what went wrong in your reasoning:
+      1. Identify the specific step where you made an error
+      2. Explain why that step was incorrect
+      3. What assumption did you make that was wrong?
+      4. What strategy would have been better?
+      5. What lesson can you learn for future puzzles?
+
+      Format your response as JSON:
+      {{
+        "error_step": "which step had the error",
+        "error_type": "logical_fallacy | incorrect_assumption | calculation_error | misinterpretation",
+        "explanation": "detailed explanation of the error",
+        "wrong_assumption": "what you assumed incorrectly",
+        "better_strategy": "what would have been better",
+        "lesson_learned": "key takeaway for future puzzles"
+      }}
+
+    variables:
+      - puzzle_text
+      - reasoning_steps
+      - your_answer
+      - correct_answer
+
+  # Debate prompt
+  debate:
+    initial: |
+      {system_prompt}
+
+      ## Your Reasoning Style: {strategy_name}
+      {strategy_description}
+
+      ## Puzzle
+      {puzzle_text}
+
+      Solve this puzzle using your assigned reasoning style.
+      Format your response as JSON with "reasoning_steps" and "final_answer".
+
+    response_to_others: |
+      You are in a debate with other agents solving the same puzzle.
+
+      ## Original Puzzle
+      {puzzle_text}
+
+      ## Your Previous Reasoning
+      {your_reasoning}
+
+      ## Other Agents' Arguments
+      {other_arguments}
+
+      ## Your Task
+      Considering the other agents' perspectives:
+      1. Do you agree with any of their points?
+      2. Are there flaws in their reasoning?
+      3. Should you modify your answer?
+
+      Format your response as JSON:
+      {{
+        "analysis_of_others": "your analysis of other agents' arguments",
+        "modified_reasoning": ["updated step 1", "updated step 2", ...],
+        "final_answer": "your final answer (may be same or different)",
+        "confidence": 0.0-1.0,
+        "reason_for_change": "why you changed or kept your answer"
+      }}
+
+    variables:
+      - system_prompt
+      - strategy_name
+      - strategy_description
+      - puzzle_text
+      - your_reasoning
+      - other_arguments
+
+  # Arbitration prompt
+  arbitration:
+    template: |
+      You are a judge evaluating multiple solutions to a puzzle.
+
+      ## Puzzle
+      {puzzle_text}
+
+      ## Correct Answer
+      {correct_answer}
+
+      ## Agent Solutions
+      {agent_solutions}
+
+      ## Task
+      Evaluate each solution and select the best one:
+      1. Check logical consistency
+      2. Verify correctness of final answer
+      3. Assess quality of reasoning
+      4. Consider confidence levels
+
+      Format your response as JSON:
+      {{
+        "evaluations": [
+          {{
+            "agent_id": "agent name",
+            "correctness": true/false,
+            "reasoning_quality": 0.0-1.0,
+            "strengths": ["strength 1", ...],
+            "weaknesses": ["weakness 1", ...]
+          }}
+        ],
+        "selected_agent": "name of best agent",
+        "final_answer": "the answer to use",
+        "justification": "why you selected this agent"
+      }}
+
+    variables:
+      - puzzle_text
+      - correct_answer
+      - agent_solutions
+
+# Reasoning strategies
+strategies:
+  conservative_deduction:
+    name: "Conservative Deduction"
+    description: |
+      You use careful, step-by-step logical deduction. You prefer certainty over speed,
+      and you only make claims you can prove with absolute certainty. You avoid assumptions
+      and prefer to work with given information only.
+
+  exploratory_reasoning:
+    name: "Exploratory Reasoning"
+    description: |
+      You explore multiple possible approaches and consider various interpretations.
+      You're creative in finding connections and willing to try unconventional paths.
+      You consider edge cases and alternative scenarios.
+
+  critical_evaluation:
+    name: "Critical Evaluation"
+    description: |
+      You focus on finding potential errors and weaknesses in reasoning.
+      You question assumptions, verify each step carefully, and look for logical fallacies.
+      You're skeptical and thorough in verification.
