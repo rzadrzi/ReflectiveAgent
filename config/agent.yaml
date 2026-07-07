@@ -1,30 +1,69 @@
+# Agent Configuration
 agent:
-  name: "ReflectiveReasoningAgent"
-  mode: "adaptive"
+  name: "puzzle_solver"
+  version: "0.1.0"
 
-execution:
-  max_attempts: 3
-  stop_on_success: true
+  # LLM Provider Selection
+  provider: "ollama" # Options: "openai", "ollama"
 
-reflection:
-  enabled: true
-  trigger_on_failure: true
-  max_reflections: 2
+  # LLM Settings
+  llm:
+    # These will be overridden by provider-specific settings
+    temperature: 0.7
+    max_tokens: 2000
+    top_p: 1.0
+    frequency_penalty: 0.0
+    presence_penalty: 0.0
 
-memory:
-  enabled: true
-  type: "episodic"
-  retrieval_top_k: 3
+    # Provider-specific models
+    openai:
+      model: "gpt-4-turbo-preview"
+      base_url: "https://api.openai.com/v1"
 
-debate:
-  enabled: true
-  num_sub_agents: 3
-  arbitration_strategy: "consensus"
+    ollama:
+      model: "llama3.1:8b" # or mistral, qwen2.5, etc.
+      base_url: "http://localhost:11434/v1"
 
-evaluation:
-  success_threshold: 1.0
-  track_metrics: true
+  # Agent Behavior
+  behavior:
+    max_retries: 3
+    retry_delay: 1.0
+    enable_streaming: false
+    timeout: 60
 
-logging:
-  level: "info"
-  save_traces: true
+  # Memory Settings
+  memory:
+    episodic:
+      enabled: true
+      max_entries: 1000
+      storage_path: "./data/memory/episodic.db"
+
+    vector:
+      enabled: true
+      collection_name: "puzzle_memory"
+      embedding_model: "text-embedding-3-small" # Note: Ollama may need different embedding
+      similarity_threshold: 0.75
+      max_results: 5
+
+  # Reflection Settings
+  reflection:
+    enabled: true
+    trigger_on_failure: true
+    trigger_on_success: false
+    max_reflection_steps: 2
+
+  # Debate Settings
+  debate:
+    enabled: false
+    num_agents: 3
+    max_rounds: 3
+    strategies:
+      - "conservative_deduction"
+      - "exploratory_reasoning"
+      - "critical_evaluation"
+
+  # Adaptation Settings
+  adaptation:
+    enabled: true
+    update_frequency: 10 # Update prompts every N puzzles
+    max_prompt_length: 4000
